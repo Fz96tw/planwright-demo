@@ -1,0 +1,17 @@
+{
+  "name": "planwright-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A tiny notes API used to demo Planwright's verifiable test evidence.",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.48.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
