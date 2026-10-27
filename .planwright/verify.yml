@@ -1,0 +1,8 @@
+# How agents run this project's tests (see CLAUDE.md). API tests only, so no browser install;
+# playwright.config.js starts the server and writes the JSON report.
+version: 1
+setup: npm ci
+run: npx playwright test --grep "{grep}"
+reports:
+  - { path: test-results/report.json, format: playwright }
+full: npm test
