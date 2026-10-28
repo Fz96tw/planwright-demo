@@ -21,7 +21,7 @@ test("a note without text is rejected", async ({ request }) => {
   expect(res.status()).toBe(400);
 });
 
-test("[INV:auth-required] [AC:ac_1] every endpoint except /health rejects missing, unknown and expired tokens", async ({ request }) => {
+test("[INV:auth-required] [AC:bf7d313b:ac_1] every endpoint except /health rejects missing, unknown and expired tokens", async ({ request }) => {
   const health = await request.get("/health");
   expect(health.status()).toBe(200);
 
@@ -44,7 +44,7 @@ test("[INV:auth-required] [AC:ac_1] every endpoint except /health rejects missin
   }
 });
 
-test("[INV:user-isolation] [AC:ac_2] a user never sees another user's notes or audit entries", async ({ request }) => {
+test("[INV:user-isolation] [AC:bf7d313b:ac_2] a user never sees another user's notes or audit entries", async ({ request }) => {
   const marker = `isolation-${Date.now()}`;
   const aliceNote = await (await request.post("/notes", { ...as("alice-token"), data: { text: `alice ${marker}` } })).json();
   const bobNote = await (await request.post("/notes", { ...as("bob-token"), data: { text: `bob ${marker}` } })).json();
@@ -63,7 +63,7 @@ test("[INV:user-isolation] [AC:ac_2] a user never sees another user's notes or a
   }
 });
 
-test("[INV:audit-append-only] [AC:ac_3] audit entries can't be modified or deleted", async ({ request }) => {
+test("[INV:audit-append-only] [AC:bf7d313b:ac_3] audit entries can't be modified or deleted", async ({ request }) => {
   await request.post("/notes", { ...as("alice-token"), data: { text: "audit before" } });
   const before = await (await request.get("/audit", as("alice-token"))).json();
   expect(before.length).toBeGreaterThan(0);
@@ -82,7 +82,7 @@ test("[INV:audit-append-only] [AC:ac_3] audit entries can't be modified or delet
   expect(after.slice(0, before.length)).toEqual(before);
 });
 
-test("[INV:no-error-leak] [AC:ac_4] error responses never include stack traces or internal details", async ({ request }) => {
+test("[INV:no-error-leak] [AC:bf7d313b:ac_4] error responses never include stack traces or internal details", async ({ request }) => {
   const malformed = await request.post("/notes", {
     headers: { authorization: "Bearer alice-token", "content-type": "application/json" },
     data: Buffer.from("{not valid json"), // a Buffer is sent as-is; a string would be JSON-encoded
