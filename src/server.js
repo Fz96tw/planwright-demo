@@ -10,6 +10,7 @@ const tokens = new Map([
 ]);
 
 const notes = []; // { id, userId, text, createdAt }
+let nextNoteId = 1; // never reused, so a deleted note's id can't be handed out again
 const auditLog = []; // append-only: { seq, userId, action, noteId, at }
 
 function send(res, status, body) {
@@ -56,10 +57,21 @@ const server = http.createServer(async (req, res) => {
       if (typeof body.text !== "string" || body.text.trim() === "") {
         return send(res, 400, { error: "text_required" });
       }
-      const note = { id: notes.length + 1, userId: auth.userId, text: body.text, createdAt: new Date().toISOString() };
+      const note = { id: nextNoteId++, userId: auth.userId, text: body.text, createdAt: new Date().toISOString() };
       notes.push(note);
       audit(auth.userId, "note.created", note.id);
       return send(res, 201, note);
+    }
+
+    const noteMatch = url.pathname.match(/^\/notes\/(\d+)$/);
+    if (req.method === "DELETE" && noteMatch) {
+      // Another user's note gets the same 404 as a missing one, so its existence isn't revealed.
+      const index = notes.findIndex((n) => n.id === Number(noteMatch[1]) && n.userId === auth.userId);
+      if (index === -1) return send(res, 404, { error: "not_found" });
+      const [note] = notes.splice(index, 1);
+      audit(auth.userId, "note.deleted", note.id);
+      res.writeHead(204);
+      return res.end();
     }
 
     if (req.method === "GET" && url.pathname === "/audit") {
