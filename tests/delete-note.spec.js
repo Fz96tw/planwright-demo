@@ -23,7 +23,7 @@ test("[AC:59033e6e:ac_1] a user can delete their own note", async ({ request }) 
   expect(await noteIds(request, "alice-token")).not.toContain(note.id);
 });
 
-test("[AC:59033e6e:ac_2] deleting a note appends a note.deleted audit entry and keeps earlier entries", async ({ request }) => {
+test("[INV:delete-audited] [AC:59033e6e:ac_2] deleting a note appends a note.deleted audit entry and keeps earlier entries", async ({ request }) => {
   const note = await createNote(request, "alice-token", "audited delete");
   const before = await auditOf(request, "alice-token");
 
