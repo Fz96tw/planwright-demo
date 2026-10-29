@@ -9,18 +9,27 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      # Check out the commit that triggered this run.
       - uses: actions/checkout@v4
+      # Install Node.js 22 and cache npm downloads between runs.
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+      # Install dependencies exactly as pinned in package-lock.json.
       - run: npm ci
+      # Run the test suite, which writes test-results/report.json.
       # API tests only, so no browser install is needed.
       - run: npm test
+      # Upload the test report as a build artifact.
       # Planwright downloads this artifact to attribute results to [AC:] and [INV:] markers.
       - uses: actions/upload-artifact@v4
+        # Upload even when tests fail, so Planwright sees the failures too.
         if: always()
         with:
+          # The artifact's name in the run.
           name: playwright-report
+          # The report file Playwright writes.
           path: test-results/report.json
+          # Fail the job if the report is missing, rather than silently uploading nothing.
           if-no-files-found: error
